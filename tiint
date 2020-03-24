@@ -1,0 +1,59 @@
+#!/bin/sh
+# name:	tiint.sh
+# desc:	a simple script for setting up a tmux session for your `ii` stuff
+#	can run on servers, channels, or irc roots
+#	just opens up `tail` on outfile and reads to infile
+# main: jaidyn ann <jadedctrl@teknik.io>
+# lisc: CC0 i guess
+
+
+# CHANNEL_PATH -> NIL
+# makes a new tmux window for the channel at given path; one pane for tailing
+# it, one for user input with loop_in.sh
+function make_channel_window {
+	channel="$1"
+	tmux neww tail -f ${channel}/out
+	tmux splitw -p 10 diff_notify.sh ${channel}/out
+	tmux splitw -p 10 loop_in.sh ${channel}/in
+}
+
+# SERVER_PATH -> NIL
+# make tmux windows for all channels at a given server path
+function make_server_windows {
+	server="$1"
+	cd "$server"
+	for channel in ./#*; do
+		make_channel_window "$(basename "$channel")"
+	done
+}
+
+# IRC_PATH -> NIL
+# make tmux windows for all servers and channels at a given IRC root
+function make_irc_windows {
+	ircroot="$1"
+	cd "$ircroot"
+	for server in ./*; do
+    		if test -d "$server"; then
+        		make_server_windows "$server"
+    		fi
+	done
+}
+
+# INVOCATION
+# ==================
+
+function help {
+	echo "usage: $(basename "$0") -i IRC_PATH"
+	echo "       $(basename "$0") -s SERVER_PATH"
+	echo "       $(basename "$0") -c CHANNEL_PATH"
+}
+
+
+while getopts 'i:s:c:h' c; do
+	case "$c" in
+    		h) help; exit 2 ;;
+    		i) make_irc_windows "$OPTARG" ;;
+    		s) make_server_windows "$OPTARG" ;;
+    		c) make_channel_window "$OPTARG" ;;
+	esac
+done
