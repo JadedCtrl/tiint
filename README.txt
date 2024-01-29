@@ -52,5 +52,5 @@ preferred notifcation method (zenity, beeping, whatever) by editing the
 BORING STUFF
 ----------------------------------------
 License is CC-0
-Author is Jaidyn Ann  <jadedctrl@teknik.io>
-Sauce is at https://git.xwx.moe/tiint
+Author is Jaidyn Ann  <jadedctrl@posteo.at>
+Sauce is at https://hak.xwx.moe/jadedctrl/tiint
